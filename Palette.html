@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>RGB_UI</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .main {
+            box-shadow: 
+            3px 3px 7px 0px rgb(0,0,0,0.1),
+            3px 3px 12px 2px rgb(0,0,0,0.2),
+            3px 3px 30px 5px rgb(0,0,0,0.1)
+
+            ;
+        }
+
+        #showcolor {
+            width: 200px;
+            height: 250px;
+            /* background-color: #f00; */
+        }
+
+        #show16 {
+            text-align: center;
+            background-color: #fff;
+            border: 3px solid #000;
+            font-weight: 900;
+            font-size: 1.5rem;
+            width: 8rem;
+            margin: 15px auto;
+
+        }
+
+        .adjust {
+            text-align: center;
+            margin:10px auto;
+        }
+
+        #red,#green,#blue {
+            -webkit-appearance: none;
+            height: 10px;
+            background: grey;
+            outline: none;
+            border-radius: 5px;
+            box-shadow: 0px 0px 2px 1px rgb(0,0,0,0.3) inset ;
+            background-image: linear-gradient(90deg,#333, #fff);
+        }
+
+        .function {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        button {
+            padding: 5px;
+            border-radius: 5px;
+            outline: none;
+            background: #fff;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div id="showcolor">
+        </div>
+        <div id="show16">#FF0000</div>
+        <div class="adjust">
+            <span>R: </span><input type="range" name="red" id="red" min="0" max="255">
+        </div>
+        <div class="adjust">
+            <span>G: </span><input type="range" name="red" id="green" min="0" max="255">
+        </div>
+        <div class="adjust">
+            <span>B: </span><input type="range" name="red" id="blue" min="0" max="255">
+        </div>
+        <div class="function">
+            <button id="dec">all-</button>
+            <button id="rand">random</button>
+            <button id="plus">all+</button>
+        </div>
+    </div>
+    <script>
+    //init
+    let cDiv = document.getElementById("showcolor")
+    let inputs = document.getElementsByTagName('input')
+    let red = inputs[0].value;
+    let green = inputs[1].value;
+    let blue = inputs[2].value;
+    let showcode = document.getElementById('show16')
+
+
+    for(let i=0; i<inputs.length; i++){
+                inputs[i].value = rand();
+                cDiv.style = `background-color: rgb(${inputs[0].value},${inputs[1].value},${inputs[2].value});`
+            }
+
+    updateCode()
+    //slider
+    
+    for(let i=0; i<inputs.length; i++){
+        inputs[i].addEventListener('input',function(){
+            cDiv.style = `background-color: rgb(${inputs[0].value},${inputs[1].value},${inputs[2].value});`
+            updateCode();
+        })
+    }
+
+    //美化slider
+
+    function sldercolor(i) {
+        for (let j = 0; j < inputs.length; j++) {
+            if (i==j) continue;
+            inputs[j].style = `
+            background-image: linear-gradient(90deg,
+            rgb(${(j==0)?0:inputs[0].value},${(j==1)?0:inputs[1].value},${(j==2)?0:inputs[2].value}),
+            rgb(${(j==0)?255:inputs[0].value},${(j==1)?255:inputs[1].value},${(j==2)?255:inputs[2].value}));`            
+        }
+    }
+
+    for(let i=0; i<inputs.length; i++){
+        sldercolor(i);
+        inputs[i].addEventListener('input',function () {
+            sldercolor(i);
+        })
+    }
+    
+
+
+    //按鍵功能
+
+    let plus = document.getElementById('plus')
+    let dec = document.getElementById('dec')
+    let random = document.getElementById('rand')
+
+    let pluscolor = ""
+
+    plus.addEventListener("mousedown",function(){
+        pluscolor = setInterval(function () {
+            for(let i=0; i<inputs.length; i++){
+                inputs[i].value ++,
+                cDiv.style = `background-color: rgb(${inputs[0].value},${inputs[1].value},${inputs[2].value});`
+                sldercolor(i);
+                updateCode()
+            }
+        },25);
+    })
+
+    plus.addEventListener("mouseup",function(){
+        clearInterval(pluscolor);
+    })
+
+    let deccolor = ""
+
+    dec.addEventListener("mousedown",function(){
+        deccolor = setInterval(function () {
+            for(let i=0; i<inputs.length; i++){
+                inputs[i].value --,
+                cDiv.style = `background-color: rgb(${inputs[0].value},${inputs[1].value},${inputs[2].value});`
+                sldercolor(i);
+                updateCode()
+            }
+        },25);
+    })
+
+    dec.addEventListener("mouseup",function(){
+        clearInterval(deccolor);
+    })
+
+    function rand(){
+        return Math.floor(256*Math.random())
+    }
+
+    let clickRand = ""
+
+    random.addEventListener("mousedown",function(){
+        clickRand = setInterval(function () {
+            for(let i=0; i<inputs.length; i++){
+                inputs[i].value = rand();
+                cDiv.style = `background-color: rgb(${inputs[0].value},${inputs[1].value},${inputs[2].value});`
+                sldercolor(i);
+                updateCode()
+            }
+        },100);
+    })
+
+    random.addEventListener("mouseup",function(){
+        clearInterval(clickRand);
+    })
+
+    //show color code
+    
+    function updateCode() {
+        let color = ""
+        for (let i = 0; i < inputs.length; i++) {
+            color += (parseInt(inputs[i].value)<17)?"0"+parseInt(inputs[i].value).toString(16):parseInt(inputs[i].value).toString(16)
+        }
+        showcode.textContent = `#${color}`
+    }
+
+
+
+
+
+    </script>
+</body>
+</html>
